@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CrediShield SaaS - Painel de Crédito</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #2563eb;
+            --success: #16a34a;
+            --bg: #f8fafc;
+            --text: #334155;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        header {
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+        h1 { color: var(--primary); margin: 0; }
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        button:hover { background-color: #1d4ed8; }
+        .result-box {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid var(--accent);
+            background: #eff6ff;
+        }
+        .badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: white;
+        }
+        .badge-aprovado { background-color: var(--success); }
+        .badge-recusado { background-color: #dc2626; }
+        .spinner {
+            display: none;
+            color: var(--accent);
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+    <!-- Simulação do Google Analytics (Métricas de Produto de Cursos Realizados) -->
+    <script>
+        console.log("Google Analytics: Tag de monitoramento de produto SaaS carregada com sucesso.");
+        function trackButtonClick(buttonName) {
+            console.log(`GA Event: Usuário clicou em [${buttonName}]`);
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛡️ CrediShield SaaS</h1>
+            <p>Painel Avançado de Análise de Risco Corporativo e IA</p>
+        </header>
+
+        <!-- Seção de Cadastro de Empresa -->
+        <div class="card">
+            <h2>1. Cadastrar Nova Empresa</h2>
+            <div class="form-group">
+                <label for="cnpj">CNPJ (apenas números):</label>
+                <input type="text" id="cnpj" placeholder="Ex: 12345678000199">
+            </div>
+            <div class="form-group">
+                <label for="razao_social">Razão Social:</label>
+                <input type="text" id="razao_social" placeholder="Ex: AutoParts Industrial SA">
+            </div>
+            <div class="form-group">
+                <label for="setor_mercado">Setor de Mercado:</label>
+                <select id="setor_mercado">
+                    <option value="Automotivo">Automotivo</option>
+                    <option value="Tecnologia">Tecnologia</option>
+                    <option value="Varejo">Varejo</option>
+                    <option value="Industria">Indústria</option>
+                </select>
+            </div>
+            <button onclick="cadastrarEmpresa(); trackButtonClick('Cadastrar Empresa')">Cadastrar no Sistema</button>
+            <p id="empresa-msg" style="font-weight: bold; margin-top: 10px;"></p>
+        </div>
+
+        <!-- Seção de Solicitação de Crédito -->
+        <div class="card">
+            <h2>2. Solicitar Análise Preditiva de Crédito</h2>
+            <div class="form-group">
+                <label for="empresa_id">ID da Empresa Cadastrada:</label>
+                <input type="number" id="empresa_id" placeholder="Ex: 1">
+            </div>
+            <div class="form-group">
+                <label for="valor_solicitado">Valor do Crédito Solicitado (R$):</label>
+                <input type="number" id="valor_solicitado" placeholder="Ex: 250000">
+            </div>
+            <button onclick="solicitarCredito(); trackButtonClick('Solicitar Analise IA')">Executar Análise com IA</button>
+            
+            <div class="spinner" id="loading-spinner">🧠 Inteligência Artificial analisando compliance setorial... Aguarde...</div>
+
+            <!-- Caixa de Resultados -->
+            <div class="result-box" id="result-box">
+                <h3>📊 Resultado da Análise de Crédito</h3>
+                <p><strong>Empresa:</strong> <span id="res-empresa"></span> (<span id="res-setor"></span>)</p>
+                <p><strong>Score Matemático Clássico:</strong> <span id="res-score" class="badge"></span></p>
+                <div style="margin-top: 15px;">
+                    <strong>📄 Parecer do Auditor de IA (RAG & Gemini):</strong>
+                    <p id="res-parecer" style="white-space: pre-line; background: white; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; line-height: 1.5;"></p>
+                </div>
+                <small style="color: #64748b;">Protocolo de Auditoria Digital: #<span id="res-protocolo"></span></small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script JavaScript para Integração com a API (Fetch Assíncrono) -->
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+
+        async function cadastrarEmpresa() {
+            const cnpj = document.getElementById("cnpj").value;
+            const razao_social = document.getElementById("razao_social").value;
+            const setor_mercado = document.getElementById("setor_mercado").value;
+            const msgEl = document.getElementById("empresa-msg");
+
+            try {
+                const response = await fetch(`${API_URL}/empresas/`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ cnpj, razao_social, setor_mercado })
+                });
+                
+                const data = await response.json();
+                if (response.ok) {
+                    msgEl.style.color = "#16a34a";
+                    msgEl.innerText = `Sucesso! Empresa salva com ID: ${data.id}. CNPJ Mascarado: ${data.cnpj_mascarado}`;
+                    document.getElementById("empresa_id").value = data.id; // autofill para facilitar UX
+                } else {
+                    msgEl.style.color = "#dc2626";
+                    msgEl.innerText = `Erro: ${data.detail || "Verifique os dados"}`;
+                }
+            } catch (err) {
+                msgEl.innerText = "Erro ao conectar com o servidor.";
+            }
+        }
+
+        async function solicitarCredito() {
+            const empresa_id = parseInt(document.getElementById("empresa_id").value);
+            const valor_solicitado = parseFloat(document.getElementById("valor_solicitado").value);
+            
+            const spinner = document.getElementById("loading-spinner");
+            const resultBox = document.getElementById("result-box");
+
+            spinner.style.display = "block";
+            resultBox.style.display = "none";
+
+            try {
+                const response = await fetch(`${API_URL}/credito/solicitar/`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ empresa_id, valor_solicitado })
+                });
+
+                const data = await response.json();
+                spinner.style.display = "none";
+
+                if (response.ok) {
+                    resultBox.style.display = "block";
+                    document.getElementById("res-empresa").innerText = data.empresa;
+                    document.getElementById("res-setor").innerText = data.setor;
+                    document.getElementById("res-protocolo").innerText = data.protocolo_id;
+                    document.getElementById("res-parecer").innerText = data.parecer_auditoria_ia;
+
+                    const scoreBadge = document.getElementById("res-score");
+                    scoreBadge.innerText = data.score_matematico;
+                    if (data.score_matematico === "Aprovado") {
+                        scoreBadge.className = "badge badge-pro">"badge badge-aprovado";
+                    } else {
+                        scoreBadge.className = "badge badge-recusado";
+                    }
+                } else {
+                    alert(`Erro na análise: ${data.detail}`);
+                }
+            } catch (err) {
+                spinner.style.display = "none";
+                alert("Erro ao processar requisição.");
+            }
+        }
+    </script>
+</body>
+</html>
