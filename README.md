@@ -82,4 +82,4 @@ O desenvolvimento do produto foi estruturado seguindo o modelo de gerenciamento 
    ```
 
 5. **Acesse a Aplicação:**
-   Abra o seu navegador de preferência e digite: `http://127.0.0` para interagir diretamente com a interface gráfica!
+   Abra o seu navegador de preferência e digite: `http://127.0.0.1:8000` para interagir diretamente com a interface gráfica!
